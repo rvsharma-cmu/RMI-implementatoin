@@ -53,23 +53,20 @@ public abstract class Stub {
 	 *                               dynamically created.
 	 */
 	public static <T> T create(Class<T> c, Skeleton<T> skeleton) throws UnknownHostException {
-		// throw new UnsupportedOperationException("not implemented");
 
 		if (c == null || skeleton == null) {
 			throw new NullPointerException("Class object 'c' or the skeleton instance is null");
 		}
 
 		checkRemoteInterface(c);
-		
-		if((skeleton != null && skeleton.inetAddress == null) || skeleton.isServerStarted == false) {
-			throw new IllegalStateException("address of the server is not given"); 
+
+		if ((skeleton != null && skeleton.getInetAddress() == null) || skeleton.isServerStarted == false) {
+			throw new IllegalStateException("address of the server is not given");
 		}
-		
-		
-		
-		// TODO check the difference between getHostName and getAddress()
-		InetSocketAddress addr = new InetSocketAddress(skeleton.inetAddress.getHostName(), skeleton.serverPort);
-		
+
+		InetSocketAddress addr = new InetSocketAddress(skeleton.getInetAddress().getHostName(),
+				skeleton.getServerPort());
+
 		return create(c, addr);
 	}
 
@@ -106,22 +103,19 @@ public abstract class Stub {
 	 *                               dynamically created.
 	 */
 	public static <T> T create(Class<T> c, Skeleton<T> skeleton, String hostname) {
-		// throw new UnsupportedOperationException("not implemented");
 
 		if (c == null || hostname == null || skeleton == null) {
 			throw new NullPointerException("Class object 'c' or the skeleton instance is null");
 		}
 
-		if(!checkRemoteInterface(c))
+		if (!checkRemoteInterface(c))
 			throw new Error(c.getName() + "is not a remote interface");
-		// TODO handle the stop conditions and exception handling
-		 
-		if(skeleton.inetAddress == null) {
-			throw new IllegalStateException("address of the server is not given"); 
+
+		if (skeleton.getInetAddress() == null) {
+			throw new IllegalStateException("address of the server is not given");
 		}
-		// TODO check the difference between getHostName and getAddress()
-		InetSocketAddress addr = new InetSocketAddress(hostname, skeleton.serverPort);
-		
+		InetSocketAddress addr = new InetSocketAddress(hostname, skeleton.getServerPort());
+
 		return create(c, addr);
 	}
 
@@ -145,36 +139,35 @@ public abstract class Stub {
 	 *                              be dynamically created.
 	 */
 	public static <T> T create(Class<T> c, InetSocketAddress address) {
-		// throw new UnsupportedOperationException("not implemented");
 
 		if (c == null || address == null) {
 			throw new NullPointerException("Either c or address is null");
 		}
-		
-		if(!checkRemoteInterface(c))
+
+		if (!checkRemoteInterface(c))
 			throw new Error(c.getName() + "is not interface");
 		if (!ifRMIExceptionThrown(c))
 			throw new Error("Doesnt represent remote interface.");
-		// TODO implement error handling 
-		
+
 		@SuppressWarnings("unchecked")
-		T response = (T)Proxy.newProxyInstance(c.getClassLoader(), new Class<?>[] {c}, new ProxyInvocationHandler<T>(c,address));
+		T response = (T) Proxy.newProxyInstance(c.getClassLoader(), new Class<?>[] { c },
+				new ProxyInvocationHandler<T>(c, address));
 		return response;
 	}
-	
+
 	private static <T> boolean checkRemoteInterface(Class<T> c) {
-		
-		if(!c.isInterface()) {
+
+		if (!c.isInterface()) {
 			return false;
-			//throw new Error(c.getName() + " not a remote interface");
 		}
 		return true;
 	}
+
 	public static boolean ifRMIExceptionThrown(Class<?> classes) {
 
 		if (!classes.isInterface())
 			return false;
-		
+
 		for (Method method : classes.getDeclaredMethods()) {
 
 			Class<?>[] exceptionList = method.getExceptionTypes();
@@ -184,5 +177,4 @@ public abstract class Stub {
 		return true;
 	}
 
-	
 }

@@ -32,7 +32,5 @@ public class ResponseObject implements Serializable {
 	public void setObjName(Object objName) {
 		this.objName = objName;
 	}
-	
-	
 
 }

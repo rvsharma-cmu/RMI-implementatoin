@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.Arrays;
@@ -32,16 +31,16 @@ import java.util.Arrays;
  * <code>service_error</code>.
  */
 public class Skeleton<T> {
-	int serverPort;
-	 ServerSocket serverSocket;
+	private int serverPort;
+	private ServerSocket serverSocket;
 	protected boolean isStopped;
 	T server;
-	Class<T> c;
-	Thread runningThread;
-	DataInputStream is;
-	PrintStream os;
-	InetSocketAddress inetAddress;
-	ThreadsHandler<T> skeletonThreads;
+	private Class<T> c;
+	protected Thread runningThread;
+	protected DataInputStream is;
+	protected PrintStream os;
+	private InetSocketAddress inetAddress;
+	protected ThreadsHandler<T> skeletonThreads;
 	boolean isServerStarted;
 
 	/**
@@ -193,7 +192,7 @@ public class Skeleton<T> {
 			}
 			this.serverPort = serverSocket.getLocalPort();
 			this.inetAddress = (InetSocketAddress) serverSocket.getLocalSocketAddress();
-			
+
 			skeletonThreads = new ThreadsHandler<T>(this, c, server, serverSocket);
 			skeletonThreads.start();
 		} else
@@ -212,25 +211,18 @@ public class Skeleton<T> {
 	 */
 	public synchronized void stop() {
 		if (skeletonThreads == null) {
-			//throw new Error("Server is already stopped");
 			return;
 		}
 		server = null;
-		if(!isServerStarted)
+		if (!isServerStarted)
 			return;
 		this.setServerStarted(false);
-		if(skeletonThreads!=null && serverSocket!=null && !serverSocket.isClosed())
-		{
-			System.out.println("Someone invoked me");
-		
-			
-			this.skeletonThreads. interrupt();
+		if (skeletonThreads != null && serverSocket != null && !serverSocket.isClosed()) {
+
+			this.skeletonThreads.interrupt();
 		}
-			
-		
-			this.serverSocket = null;
-			
-			
+
+		this.serverSocket = null;
 
 	}
 
@@ -256,6 +248,14 @@ public class Skeleton<T> {
 
 		return true;
 
+	}
+
+	public int getServerPort() {
+		return this.serverPort;
+	}
+	
+	public InetSocketAddress getInetAddress() {
+		return this.inetAddress;
 	}
 
 }

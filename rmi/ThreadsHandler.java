@@ -28,50 +28,42 @@ public class ThreadsHandler<T> extends Thread {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-
-		
-
 		while (this.skeletonInstance.isServerStarted) {
 
 			try {
 				Socket clientSocket = null;
-				if(!serverSocket.isClosed())
-					clientSocket  = serverSocket.accept();
+				if (!serverSocket.isClosed())
+					clientSocket = serverSocket.accept();
 				if (this.skeletonInstance.isServerStarted())
 					this.executorThread.execute(new WorkerThreads<T>(c, skeletonInstance, clientSocket, server));
 
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
-				if(this.skeletonInstance.isServerStarted)
-				{
+				if (this.skeletonInstance.isServerStarted) {
 					boolean cont = this.skeletonInstance.listen_error(e);
-					if(cont)
+					if (cont)
 						continue;
-					else
-					{
+					else {
 						this.skeletonInstance.stop();
 						this.skeletonInstance.stopped(e);
 					}
 				}
-					
+
 				return;
 			}
 		}
 		this.executorThread.shutdown();
 		try {
 			this.executorThread.awaitTermination(1, TimeUnit.MINUTES);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-		//this.skeletonInstance.skeletonThreads = null;
-		//this.skeletonInstance.serverSocket = null;
+		} catch (InterruptedException ex) {
+			ex.printStackTrace();
+		}
+
 		try {
-			System.out.println("Server got closed");
 			this.serverSocket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 		this.skeletonInstance.stopped(new Throwable());

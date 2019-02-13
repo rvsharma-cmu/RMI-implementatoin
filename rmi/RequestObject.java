@@ -14,11 +14,11 @@ public class RequestObject implements Serializable {
 	Object[] arguments;
 	Class<?>[] argTypes;
 
-	public RequestObject(String mthdName, Object[] arguments,Class<?>[] argTypes) {
+	public RequestObject(String mthdName, Object[] arguments, Class<?>[] argTypes) {
 		super();
 		this.mthdName = mthdName;
 		this.arguments = arguments;
-		this.argTypes = argTypes; 
+		this.argTypes = argTypes;
 	}
 
 	public Class<?>[] getArgTypes() {
