@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class ThreadsHandler<T> extends Thread {
+public class ListenerThreads<T> extends Thread {
 
 	ServerSocket serverSocket;
 	Skeleton<T> skeletonInstance;
@@ -16,7 +16,7 @@ public class ThreadsHandler<T> extends Thread {
 	T server;
 	ExecutorService executorThread = Executors.newCachedThreadPool();
 
-	public ThreadsHandler(Skeleton<T> skeleton, Class<T> c, T server, ServerSocket serverSocket) {
+	public ListenerThreads(Skeleton<T> skeleton, Class<T> c, T server, ServerSocket serverSocket) {
 
 		this.c = c;
 		this.serverSocket = serverSocket;

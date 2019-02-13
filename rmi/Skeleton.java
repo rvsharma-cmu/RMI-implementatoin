@@ -32,7 +32,6 @@ import java.util.Arrays;
  */
 public class Skeleton<T> {
 	private int serverPort;
-	private ServerSocket serverSocket;
 	protected boolean isStopped;
 	T server;
 	private Class<T> c;
@@ -40,8 +39,9 @@ public class Skeleton<T> {
 	protected DataInputStream is;
 	protected PrintStream os;
 	private InetSocketAddress inetAddress;
-	protected ThreadsHandler<T> skeletonThreads;
+	protected ListenerThreads<T> skeletonThreads;
 	boolean isServerStarted;
+	private ServerSocket serverSocket;
 
 	/**
 	 * Creates a <code>Skeleton</code> with no initial server address. The address
@@ -63,8 +63,29 @@ public class Skeleton<T> {
 	 *                              <code>server</code> is <code>null</code>.
 	 */
 	public Skeleton(Class<T> c, T server) {
-		this(c, server, null);
+		
+		if (c == null) {
+			throw new NullPointerException("class is null. Try again");
+		}
+		
+		if(server == null) {
+			throw new NullPointerException("Server is null");
+		}
+ 		
+		if (!ifRMIExceptionThrown(c))
+			throw new Error("Not a remote interface.");
+		/*
+		 * Check if the parameter c passed is actually an interface
+		 */
+		if (!c.isInterface()) {
+			throw new Error("Not an interface. Try again");
+		}
 
+		setServerStarted(false);
+		
+		this.c = c;
+		this.server = server;
+		this.inetAddress = null;
 	}
 
 	/**
@@ -91,22 +112,29 @@ public class Skeleton<T> {
 		/*
 		 * Check if either of c or server are null
 		 */
-		if (c == null || server == null) {
-			throw new NullPointerException("Either class or server is null. Try again");
+		if (c == null) {
+			throw new NullPointerException("class is null. Try again");
 		}
+		
+		if(server == null) {
+			throw new NullPointerException("Server is null");
+		}
+ 		
+		if (!ifRMIExceptionThrown(c))
+			throw new Error("Not a remote interface.");
 		/*
 		 * Check if the parameter c passed is actually an interface
 		 */
 		if (!c.isInterface()) {
 			throw new Error("Not an interface. Try again");
 		}
-		if (!ifRMIExceptionThrown(c))
-			throw new Error("Doesnt represent remote interface.");
+
+		setServerStarted(false);
+		
 		this.c = c;
 		this.server = server;
 		this.inetAddress = address;
-		this.setServerStarted(false);
-
+		
 	}
 
 	/**
@@ -175,16 +203,16 @@ public class Skeleton<T> {
 	 *                      server has already been started and has not since
 	 *                      stopped.
 	 */
-	/*
-	 * Port number reference from https://stackoverflow.com/questions/
-	 * 10476987/best-tcp-port-number-range-for-internal-applications
-	 */
 	public synchronized void start() throws RMIException, IOException {
 
-		if (this.isServerStarted == false) {
-			this.setServerStarted(true);
-			if (inetAddress == null) {
+		// start the server 
+		if (isServerStarted == false) {
+			setServerStarted(true);
+			
+		// if no port received 
+		if (inetAddress == null) {
 
+				// get ephemeral port 
 				serverSocket = new ServerSocket(0);
 				inetAddress = (InetSocketAddress) serverSocket.getLocalSocketAddress();
 			} else {
@@ -193,7 +221,7 @@ public class Skeleton<T> {
 			this.serverPort = serverSocket.getLocalPort();
 			this.inetAddress = (InetSocketAddress) serverSocket.getLocalSocketAddress();
 
-			skeletonThreads = new ThreadsHandler<T>(this, c, server, serverSocket);
+			skeletonThreads = new ListenerThreads<T>(this, c, server, serverSocket);
 			skeletonThreads.start();
 		} else
 			throw new Error("The server is already started");
@@ -234,6 +262,14 @@ public class Skeleton<T> {
 		this.isServerStarted = isServerStarted;
 	}
 
+	public int getServerPort() {
+		return this.serverPort;
+	}
+	
+	public InetSocketAddress getInetAddress() {
+		return this.inetAddress;
+	}
+	
 	public static boolean ifRMIExceptionThrown(Class<?> classes) {
 
 		if (!classes.isInterface())
@@ -249,13 +285,4 @@ public class Skeleton<T> {
 		return true;
 
 	}
-
-	public int getServerPort() {
-		return this.serverPort;
-	}
-	
-	public InetSocketAddress getInetAddress() {
-		return this.inetAddress;
-	}
-
 }
