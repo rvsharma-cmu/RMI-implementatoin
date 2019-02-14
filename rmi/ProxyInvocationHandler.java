@@ -37,9 +37,10 @@ public class ProxyInvocationHandler<T> implements InvocationHandler, Serializabl
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
 		ResponseObject responseObject = null;
+		// extract the method name which is to be invoked
 		String methodName = method.getName();
-		String methodReturnType = method.getReturnType().getName();
 		Object objectRes = null;
+
 		if (methodName.equals("equals") && method.getParameterTypes().length >= 1) {
 			return isEqualsStub(proxy, method, args);
 		}
@@ -49,6 +50,7 @@ public class ProxyInvocationHandler<T> implements InvocationHandler, Serializabl
 			return toStringStub(proxy);
 		Socket clientSocket = null;
 
+		// create ObjectOutput and ObjectInput stream
 		clientSocket = new Socket(address, port);
 		ObjectOutputStream objectOutputStream = null;
 		ObjectInputStream objectInputStream = null;
@@ -61,6 +63,7 @@ public class ProxyInvocationHandler<T> implements InvocationHandler, Serializabl
 		objectOutputStream = new ObjectOutputStream(out);
 		objectOutputStream.flush();
 
+		// send the request object to the server
 		try {
 			objectOutputStream.writeObject(new RequestObject(methodName, args, method.getParameterTypes()));
 			objectOutputStream.flush();
@@ -71,17 +74,19 @@ public class ProxyInvocationHandler<T> implements InvocationHandler, Serializabl
 
 		objectInputStream = new ObjectInputStream(in);
 
+		// recieve the response object from the server
 		try {
 			responseObject = (ResponseObject) objectInputStream.readObject();
 		} catch (ClassNotFoundException e1) {
 			clientSocket.close();
-			;
+
 			throw new RMIException("Can't convert received object to ReturnObj.", e1);
 		} catch (IOException e1) {
 			clientSocket.close();
-			;
+
 			throw new RMIException("Can't read from inStream when receive from skeleton.", e1);
 		}
+		// close all the connections once done
 		try {
 			objectOutputStream.close();
 			objectInputStream.close();
@@ -116,10 +121,12 @@ public class ProxyInvocationHandler<T> implements InvocationHandler, Serializabl
 		}
 
 		ProxyInvocationHandler<T> proxyInvocationHandler = (ProxyInvocationHandler<T>) handlerObj1;
+		// if either of the object.c is null while other isnt
 		if (proxyInvocationHandler.c == null ^ this.c == null) {
 			return false;
 		}
 
+		// if either of the objects address is null while other isnt
 		if (proxyInvocationHandler.address == null ^ (this.address == null)) {
 			return false;
 		}
@@ -144,6 +151,9 @@ public class ProxyInvocationHandler<T> implements InvocationHandler, Serializabl
 		@SuppressWarnings("unchecked")
 		ProxyInvocationHandler<T> stubProxy = (ProxyInvocationHandler<T>) Proxy.getInvocationHandler(proxy);
 
+		/*
+		 * Check all cases when either of the fields is null or all of them are null
+		 */
 		if (stubProxy.c != null && stubProxy.address != null)
 			return stubProxy.c.getName() + " " + stubProxy.address.toString() + " " + Integer.toString(stubProxy.port);
 		if (stubProxy.c == null && stubProxy.address != null)

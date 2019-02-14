@@ -63,15 +63,15 @@ public class Skeleton<T> {
 	 *                              <code>server</code> is <code>null</code>.
 	 */
 	public Skeleton(Class<T> c, T server) {
-		
+
 		if (c == null) {
 			throw new NullPointerException("class is null. Try again");
 		}
-		
-		if(server == null) {
+
+		if (server == null) {
 			throw new NullPointerException("Server is null");
 		}
- 		
+
 		if (!ifRMIExceptionThrown(c))
 			throw new Error("Not a remote interface.");
 		/*
@@ -82,7 +82,7 @@ public class Skeleton<T> {
 		}
 
 		setServerStarted(false);
-		
+
 		this.c = c;
 		this.server = server;
 		this.inetAddress = null;
@@ -115,11 +115,11 @@ public class Skeleton<T> {
 		if (c == null) {
 			throw new NullPointerException("class is null. Try again");
 		}
-		
-		if(server == null) {
+
+		if (server == null) {
 			throw new NullPointerException("Server is null");
 		}
- 		
+
 		if (!ifRMIExceptionThrown(c))
 			throw new Error("Not a remote interface.");
 		/*
@@ -130,11 +130,11 @@ public class Skeleton<T> {
 		}
 
 		setServerStarted(false);
-		
+
 		this.c = c;
 		this.server = server;
 		this.inetAddress = address;
-		
+
 	}
 
 	/**
@@ -205,14 +205,14 @@ public class Skeleton<T> {
 	 */
 	public synchronized void start() throws RMIException, IOException {
 
-		// start the server 
+		// start the server
 		if (isServerStarted == false) {
 			setServerStarted(true);
-			
-		// if no port received 
-		if (inetAddress == null) {
 
-				// get ephemeral port 
+			// if no port received
+			if (inetAddress == null) {
+
+				// get ephemeral port
 				serverSocket = new ServerSocket(0);
 				inetAddress = (InetSocketAddress) serverSocket.getLocalSocketAddress();
 			} else {
@@ -265,11 +265,11 @@ public class Skeleton<T> {
 	public int getServerPort() {
 		return this.serverPort;
 	}
-	
+
 	public InetSocketAddress getInetAddress() {
 		return this.inetAddress;
 	}
-	
+
 	public static boolean ifRMIExceptionThrown(Class<?> classes) {
 
 		if (!classes.isInterface())

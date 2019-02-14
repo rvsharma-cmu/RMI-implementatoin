@@ -39,6 +39,8 @@ public class WorkerThreads<T> extends Thread {
 		OutputStream outToServer = null;
 		try {
 			if (this.skeleton.isServerStarted && clientSocket != null && !clientSocket.isClosed()) {
+				
+				//Create the input and output stream
 				inFromServer = clientSocket.getInputStream();
 
 				outToServer = clientSocket.getOutputStream();
@@ -47,6 +49,8 @@ public class WorkerThreads<T> extends Thread {
 				outputStream = new ObjectOutputStream(out);
 				outputStream.flush();
 				inputStream = new ObjectInputStream(in);
+				
+				//recive the request data from client(deserialization data)
 				requestData = (RequestObject) inputStream.readObject();
 			}
 
@@ -68,6 +72,7 @@ public class WorkerThreads<T> extends Thread {
 
 		if (responseData != null) {
 			try {
+				//send the data back to client (Serialize data)
 				outputStream.writeObject(responseData);
 				outputStream.flush();
 
@@ -78,6 +83,9 @@ public class WorkerThreads<T> extends Thread {
 		}
 	}
 
+	/*
+	 * Generate the response object based on various params sent in the request
+	 */
 	private ResponseObject getResponseObject(RequestObject requestData) {
 
 		Object respObject = null;

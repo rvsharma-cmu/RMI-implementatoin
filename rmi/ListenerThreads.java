@@ -28,6 +28,9 @@ public class ListenerThreads<T> extends Thread {
 
 	@Override
 	public void run() {
+		/*
+		 * keep looping until the server instance is running
+		 */
 		while (this.skeletonInstance.isServerStarted) {
 
 			try {
@@ -53,6 +56,7 @@ public class ListenerThreads<T> extends Thread {
 				return;
 			}
 		}
+		// if the server is stopped
 		this.executorThread.shutdown();
 		try {
 			this.executorThread.awaitTermination(1, TimeUnit.MINUTES);
@@ -60,6 +64,7 @@ public class ListenerThreads<T> extends Thread {
 			ex.printStackTrace();
 		}
 
+		// shut the serer down
 		try {
 			this.serverSocket.close();
 		} catch (IOException e) {
