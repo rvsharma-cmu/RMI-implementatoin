@@ -1,4 +1,7 @@
-package rmi;
+package pingpong;
+
+
+import rmi.*;
 
 public interface PingPongInterface {
 	

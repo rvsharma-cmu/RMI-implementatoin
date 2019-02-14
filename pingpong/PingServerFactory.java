@@ -1,7 +1,8 @@
-package rmi;
+package pingpong;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import rmi.*;
 
 public class PingServerFactory {
 	

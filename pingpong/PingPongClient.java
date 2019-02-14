@@ -1,6 +1,9 @@
-package rmi;
+package pingpong;
 import java.net.*;
 import java.util.Scanner;
+
+import rmi.RMIException;
+import rmi.*;
 
 public class PingPongClient {
 

@@ -1,8 +1,12 @@
-package rmi;
+package pingpong;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Scanner; 
+import java.util.Scanner;
+
+import rmi.RMIException;
+import rmi.Skeleton; 
+import rmi.*;
 
 public class PingPongServer implements PingPongInterface{
 	
@@ -16,10 +20,11 @@ public class PingPongServer implements PingPongInterface{
 		int portNumber; 
 		
 		Scanner reader = new Scanner(System.in);
-		System.out.println("Enter the port number for the server to bind: ");
+		System.out.println("Enter the port number for the server to bind(>50000): ");
 		
-		portNumber = 55790;
-				//Integer.parseInt(reader.nextLine());
+		portNumber = Integer.parseInt(reader.nextLine());
+				// = 55790;
+				
 		PingPongInterface remoteInterface = PingServerFactory.makePingServer();
 		InetSocketAddress address = new InetSocketAddress(portNumber);
 		
